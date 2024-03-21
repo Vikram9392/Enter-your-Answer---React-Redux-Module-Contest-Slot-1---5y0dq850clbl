@@ -34,24 +34,62 @@ function Quiz() {
     const [attempts, setAttempts] = useState(0);
     const [gameOver, setGameOver] = useState(false);
     const [score, setScore] = useState(0);
-  
+
+    const handleAnswer = (event) => {
+        setAnswer(event.target.value.toLowerCase());
+    };
+
+    const handleSubmit = () => {
+        if (answer === questions[questionIndex].answer.toLowerCase()) {
+            setScore(score + 1);
+            setAnswer("");
+            setAttempts(0);
+            if (questionIndex < questions.length - 1) {
+                setQuestionIndex(questionIndex + 1);
+            } else {
+                setGameOver(true);
+            }
+        } else {
+            if (attempts < 2) {
+                setAttempts(attempts + 1);
+            } else {
+                setAnswer("");
+                setAttempts(0);
+                if (questionIndex < questions.length - 1) {
+                    setQuestionIndex(questionIndex + 1);
+                } else {
+                    setGameOver(true);
+                }
+            }
+        }
+    };
+
+    const handleRetry = () => {
+        setQuestionIndex(0);
+        setAnswer("");
+        setAttempts(0);
+        setGameOver(false);
+        setScore(0);
+    };
+
     if (gameOver) {
-      return (
-        <div className="game-over-container">
-          <h1 className="game-over-heading">Game Over</h1>
-          <p className="score-para">Your score: score/questions.length</p>
-          <button className="retry-btn">Retry</button>
-        </div>
-      );
+        return (
+            <div className="game-over-container">
+                <h1 className="game-over-heading">Game Over</h1>
+                <p className="score-para">Your score: {score}/{questions.length}</p>
+                <button className="retry-btn" onClick={handleRetry}>Retry</button>
+            </div>
+        );
     }
-  
+
     return (
-      <div>
-        <h1 className="question-text">questionText</h1>
-        <input className="answer-input"/><br />
-        <button className="submit-btn">Submit</button>
-        <p className="attempt-alert">Incorrect. Two attempts remaining.</p>
-      </div>
+        <div>
+            <h1 className="question-text">{questions[questionIndex].question}</h1>
+            <input className="answer-input" value={answer} onChange={handleAnswer} /><br />
+            <button className="submit-btn" onClick={handleSubmit}>Submit</button>
+            {attempts === 1 && <p className="attempt-alert">Incorrect. Two attempts remaining.</p>}
+            {attempts === 2 && <p className="attempt-alert">Incorrect. One attempt remaining.</p>}
+        </div>
     );
 }
 
